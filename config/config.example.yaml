@@ -1,0 +1,24 @@
+queue:
+  type: rabbitmq
+  url: amqp://guest:guest@localhost:5672
+  exchange: email.bounce
+  queue_name: dsnparser
+
+input:
+  type: "unix"
+  path: "/var/run/mta2amqp.sock"
+
+log:
+  level: debug
+  outputs:
+    - type: "stdout"
+    - type: "file"
+      filename: "/var/log/mta2amqp.log"
+    - type: elk
+      url: "http://elk-server:9200"
+      index: "dsnparser"
+    - type: kafka
+      brokers:
+        - "kafka-server1:9092"
+        - "kafka-server2:9092"
+      topic: "dsnparser"
