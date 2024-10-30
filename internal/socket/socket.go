@@ -33,23 +33,34 @@ func (s *Socket) Start(ctx context.Context, p func(msg []byte) error) error {
 		return err
 	}
 
-	defer func(name string) {
-		err := os.Remove(name)
-		if err != nil {
-			log.Fatalf("Failed to remove socket file: %v", err)
-		}
-	}(s.config.GetPath())
-	defer func(l net.Listener) {
-		err := l.Close()
-		if err != nil {
-			log.Fatalf("Failed to close listener: %v", err)
-		}
-	}(l)
+	// defer func(name string) {
+	// 	err := os.Remove(name)
+	// 	if err != nil {
+	// 		log.Fatalf("Failed to remove socket file: %v", err)
+	// 	}
+	// }(s.config.GetPath())
+	// defer func(l net.Listener) {
+	// 	err := l.Close()
+	// 	if err != nil {
+	// 		log.Fatalf("Failed to close listener: %v", err)
+	// 	}
+	// }(l)
 
 	for {
 		select {
 		case <-ctx.Done():
 			log.Info("Context canceled, stopping socket listener...")
+
+			err = s.Close()
+			if err != nil {
+				return err
+			}
+
+			err := l.Close()
+			if err != nil {
+				return err
+			}
+
 			return nil
 		default:
 			conn, err := l.Accept()
@@ -78,4 +89,16 @@ func (s *Socket) handleConnection(ctx context.Context, conn net.Conn, f func(msg
 	} else {
 		log.Info("Email processed successfully")
 	}
+}
+
+func (s *Socket) Close() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	err := os.Remove(s.config.GetPath())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

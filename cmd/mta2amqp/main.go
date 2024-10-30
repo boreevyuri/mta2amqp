@@ -5,6 +5,7 @@ import (
 	"mta2amqp/internal/config"
 	"mta2amqp/internal/logger"
 	"mta2amqp/internal/queues"
+	"mta2amqp/internal/socket"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,6 +31,12 @@ func main() {
 
 	if err = queueManager.Start(ctx); err != nil {
 		log.Fatalf("Failed to start queue: %s ", err.Error())
+	}
+
+	s := socket.NewSocket(&cfg.InputParams)
+	err = s.Start(ctx, queueManager.Publish)
+	if err != nil {
+		log.Fatalf("Failed to start socket: %s ", err.Error())
 	}
 
 	// Work with signals to stop the application

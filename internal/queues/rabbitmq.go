@@ -53,7 +53,7 @@ func (r *RabbitMQ) manageConnection(ctx context.Context) {
 				r.log.Errorf("Error in connection or consuming: %v. Retrying in 5 seconds...", err)
 				time.Sleep(5 * time.Second)
 			} else {
-				go r.waitForConnectionLoss(ctx)
+				r.waitForConnectionLoss(ctx)
 			}
 		}
 	}
@@ -130,7 +130,7 @@ func (r *RabbitMQ) Deliveries() <-chan io.Reader {
 func (r *RabbitMQ) Publish(msg []byte) error {
 	return r.channel.Publish(
 		r.config.ExchangeName(),
-		r.config.QueueName(),
+		BounceRoutingKey,
 		false,
 		false,
 		amqp.Publishing{

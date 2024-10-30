@@ -103,7 +103,7 @@ func (c *Config) setupInput() {
 
 	if c.InputParams.Path == "" {
 		if path := viper.GetString("input_path"); path != "" {
-			println("Input Path: %s", path)
+			println("Input Path: ", path)
 			c.InputParams.Path = path
 		} else {
 			c.InputParams.Path = "/var/run/mta2amqp.sock"
