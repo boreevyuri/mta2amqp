@@ -13,25 +13,21 @@ type Consumer interface {
 	Close() error
 }
 
-func SetupConsumer(config QueueConfigProvider) (Consumer, error) {
-	switch config.QueueType() {
+func SetupConsumer(config QueueConfigurator) (Consumer, error) {
+	cfg, err := config.Parse()
+	if err != nil {
+		return nil, err
+	}
+	switch cfg["type"] {
 	case "rabbitmq":
-		return NewRabbitMQ(config), nil
+		return NewRabbitMQ(cfg), nil
 	case "kafka":
-		return NewKafka(config), nil
+		return NewKafka(cfg), nil
 	default:
 		return nil, errors.New("unknown queue type")
 	}
 }
 
-type Config struct {
-	Queue QueueConfigProvider `mapstructure:"queue"`
-}
-
-type QueueConfigProvider interface {
-	Validate() error
-	QueueType() string
-	AccessUri() string
-	ExchangeName() string
-	QueueName() string
+type QueueConfigurator interface {
+	Parse() (map[string]string, error)
 }

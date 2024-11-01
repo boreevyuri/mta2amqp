@@ -2,15 +2,13 @@ package config
 
 type InputConfig struct {
 	Type string `mapstructure:"type"`
-	Path string `mapstructure:"listen"`
+	Path string `mapstructure:"path"`
 }
 
-// GetPath returns the listen address
-func (c *InputConfig) GetPath() string {
-	return c.Path
-}
-
-// GetType returns the type of input
-func (c *InputConfig) GetType() string {
-	return c.Type
+// Parse returns the input configuration
+func (c *InputConfig) Parse() map[string]string {
+	return map[string]string{
+		"type": c.Type,
+		"path": c.Path,
+	}
 }

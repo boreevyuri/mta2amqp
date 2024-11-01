@@ -5,12 +5,14 @@ import (
 	"io"
 )
 
+type kafkaConfig map[string]string
+
 // Kafka example
 type Kafka struct {
-	config QueueConfigProvider
+	cfg kafkaConfig
 }
 
-func NewKafka(_ QueueConfigProvider) *Kafka {
+func NewKafka(_ kafkaConfig) *Kafka {
 	return &Kafka{}
 }
 
